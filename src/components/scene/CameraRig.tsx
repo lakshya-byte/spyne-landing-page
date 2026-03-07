@@ -4,6 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { scrollState } from "@/components/animation/ScrollController";
 
 export default function CameraRig() {
   const { camera, set } = useThree();
@@ -26,16 +27,9 @@ export default function CameraRig() {
   }, [set, camera]);
 
   useFrame((state) => {
-    // For now, simple passive rotation or idle breathing
-    // We will connect this to GSAP ScrollTrigger later
-    const time = state.clock.getElapsedTime();
-
-    // Idle breathing shake
-    const shakeX = Math.sin(time * 0.5) * 0.01;
-    const shakeY = Math.cos(time * 0.7) * 0.01;
-
-    // Ensure camera always looks at the car center
-    state.camera.lookAt(shakeX, 0.5 + shakeY, 0);
+    const cam = scrollState.camera;
+    state.camera.position.set(cam.x, cam.y, cam.z);
+    state.camera.lookAt(cam.tx, cam.ty, cam.tz);
   });
 
   return <PerspectiveCamera ref={cameraRef} fov={45} near={0.1} far={100} />;

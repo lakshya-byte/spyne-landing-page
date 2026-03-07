@@ -1,11 +1,17 @@
 "use client";
 
+import React from "react";
 import { useEffect, useRef, useState, memo } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-function CarModel() {
-  const groupRef = useRef<THREE.Group>(null);
+type CarModelProps = {
+  groupRef?: React.RefObject<THREE.Group | null>;
+};
+
+function CarModel({ groupRef }: CarModelProps) {
+  const internalGroupRef = useRef<THREE.Group>(null);
+  const targetGroupRef = groupRef ?? internalGroupRef;
   const [model, setModel] = useState<THREE.Group | null>(null);
 
   const modelUrl = "/porsche_911_gt2_rs_with_angle_eyes.glb";
@@ -45,10 +51,10 @@ function CarModel() {
   if (!model) return null;
 
   return (
-    <group ref={groupRef} position={[0, -1.1, 0]}>
+    <group ref={targetGroupRef} position={[0, -1.2, 0]}>
       <primitive
         object={model}
-        scale={0.9}
+        scale={0.6}
         rotation={[0, Math.PI / 2, 0]}
       />
     </group>

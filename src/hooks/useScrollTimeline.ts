@@ -3,6 +3,7 @@
 import { useLayoutEffect } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
+import { useLenisScroll } from "./useLenisScroll";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,7 +22,37 @@ export const scrollStore = {
 };
 
 export function useScrollTimeline() {
+    const lenisRef = useLenisScroll({ lerp: 0.08 });
+
     useLayoutEffect(() => {
+        gsap.ticker.lagSmoothing(0);
+
+        const lenis = lenisRef.current;
+        if (lenis) {
+            ScrollTrigger.scrollerProxy(document.documentElement, {
+                scrollTop(value) {
+                    if (typeof value === "number") {
+                        lenis.scrollTo(value, { immediate: true });
+                    }
+                    return window.scrollY || document.documentElement.scrollTop;
+                },
+                getBoundingClientRect() {
+                    return {
+                        top: 0,
+                        left: 0,
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                    };
+                },
+            });
+
+            lenis.on("scroll", () => {
+                ScrollTrigger.update();
+            });
+
+            ScrollTrigger.addEventListener("refresh", () => lenis.resize());
+        }
+
         let ctx = gsap.context(() => {
             ScrollTrigger.create({
                 trigger: "#scroll-container",
@@ -35,6 +66,12 @@ export function useScrollTimeline() {
                 }
             });
         });
-        return () => ctx.revert();
-    }, []);
+
+        ScrollTrigger.refresh();
+
+        return () => {
+            ScrollTrigger.removeEventListener("refresh", () => lenis?.resize());
+            ctx.revert();
+        };
+    }, [lenisRef]);
 }

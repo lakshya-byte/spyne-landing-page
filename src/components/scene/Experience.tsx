@@ -2,6 +2,9 @@
 
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
+import { useEffect, useRef } from "react";
+import * as THREE from "three";
+import { useFrame } from "@react-three/fiber";
 import {
   EffectComposer,
   Bloom,
@@ -15,8 +18,30 @@ import CameraRig from "./CameraRig";
 import Environment from "./Environment";
 import ReflectionSystem from "./ReflectionSystem";
 import ParticleSystem from "./ParticleSystem";
+import LightSweep from "./LightSweep";
+import { initScrollController, scrollState } from "@/components/animation/ScrollController";
+
+function CarChoreography({ carGroupRef }: { carGroupRef: React.RefObject<THREE.Group | null> }) {
+  useFrame(() => {
+    const g = carGroupRef.current;
+    if (!g) return;
+    const car = scrollState.car;
+    g.position.set(car.x, car.y, car.z);
+    g.rotation.set(car.rx, car.ry, car.rz);
+  });
+  return null;
+}
 
 export default function Experience() {
+  const carGroupRef = useRef<THREE.Group | null>(null);
+
+  useEffect(() => {
+    const unsub = initScrollController();
+    return () => {
+      unsub();
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 w-full h-full bg-black z-0">
       <Canvas
@@ -35,9 +60,11 @@ export default function Experience() {
           <CameraRig />
           <LightingRig />
           <Environment />
-          <CarModel />
+          <CarModel groupRef={carGroupRef} />
+          <CarChoreography carGroupRef={carGroupRef} />
           <ReflectionSystem />
           <ParticleSystem />
+          <LightSweep />
 
           <EffectComposer multisampling={4}>
             <Bloom luminanceThreshold={1.5} mipmapBlur intensity={1.2} />
