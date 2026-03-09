@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
-import { useEffect, useRef, useState, memo } from "react";
+import React, { useEffect, useRef, useState, memo } from "react";
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 type CarModelProps = {
   groupRef?: React.RefObject<THREE.Group | null>;
@@ -12,6 +13,7 @@ type CarModelProps = {
 function CarModel({ groupRef }: CarModelProps) {
   const internalGroupRef = useRef<THREE.Group>(null);
   const targetGroupRef = groupRef ?? internalGroupRef;
+
   const [model, setModel] = useState<THREE.Group | null>(null);
 
   const modelUrl = "/porsche_911_gt2_rs_with_angle_eyes.glb";
@@ -19,16 +21,28 @@ function CarModel({ groupRef }: CarModelProps) {
   useEffect(() => {
     const loader = new GLTFLoader();
 
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+    loader.setDRACOLoader(dracoLoader);
+
+    const warnTimeout = window.setTimeout(() => {
+      console.warn(
+        "CarModel: model load is taking unusually long. If this persists, check Network tab for the .glb request and any decoder/wasm failures.",
+        modelUrl
+      );
+    }, 8000);
+
     loader.load(
       modelUrl,
       (gltf) => {
+        window.clearTimeout(warnTimeout);
         const scene = gltf.scene.clone(true);
 
         scene.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) {
             const mesh = child as THREE.Mesh;
 
-            mesh.castShadow = true;
+            mesh.castShadow = false;
             mesh.receiveShadow = false;
 
             if (mesh.material instanceof THREE.MeshStandardMaterial) {
@@ -43,10 +57,16 @@ function CarModel({ groupRef }: CarModelProps) {
       },
       undefined,
       (error) => {
+        window.clearTimeout(warnTimeout);
         console.error("GLTF loading error:", modelUrl, error);
       }
     );
-  }, []);
+
+    return () => {
+      window.clearTimeout(warnTimeout);
+      dracoLoader.dispose();
+    };
+  }, [modelUrl]);
 
   if (!model) return null;
 
