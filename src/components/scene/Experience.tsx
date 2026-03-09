@@ -19,19 +19,62 @@ import Environment from "./Environment";
 import ReflectionSystem from "./ReflectionSystem";
 import ParticleSystem from "./ParticleSystem";
 import LightSweep from "./LightSweep";
-import { initScrollController, scrollState } from "@/components/animation/ScrollController";
+import {
+  initScrollController,
+  scrollState,
+} from "@/components/animation/ScrollController";
 
-function CarChoreography({ carGroupRef }: { carGroupRef: React.RefObject<THREE.Group | null> }) {
+/**
+ * CarChoreography
+ *
+ * Purpose:
+ * Synchronizes the 3D car model's position and rotation with the global scroll state.
+ *
+ * Interactions:
+ * - Reads `scrollState.car` on every frame.
+ *
+ * Performance Considerations:
+ * - Mutates the THREE.Group properties directly inside `useFrame`.
+ * - Allocates ZERO new objects per frame to prevent Garbage Collection (GC) stutters.
+ */
+function CarChoreography({
+  carGroupRef,
+}: {
+  carGroupRef: React.RefObject<THREE.Group | null>;
+}) {
   useFrame(() => {
     const g = carGroupRef.current;
     if (!g) return;
     const car = scrollState.car;
+    // Direct mutation - highly performant, avoids React reconciliation
     g.position.set(car.x, car.y, car.z);
     g.rotation.set(car.rx, car.ry, car.rz);
   });
   return null;
 }
 
+/**
+ * Experience - The core WebGL scene wrapper
+ *
+ * Purpose:
+ * Initializes the React Three Fiber <Canvas> and orchestrates all 3D scene elements
+ * (lighting, models, post-processing, and environment).
+ *
+ * Interactions:
+ * - Unifies `CameraRig`, `LightingRig`, `Environment`, and `CarModel`.
+ * - Initializes the `ScrollController` on mount to bind GSAP scroll timelines.
+ *
+ * Performance Considerations:
+ * - Uses `powerPreference="high-performance"` to request discrete GPUs on dual-GPU systems.
+ * - Caps Device Pixel Ratio (`dpr={[1, 1.5]}`) instead of `[1, 2]` to drastically reduce
+ *   fill rate usage on 4K/high-DPI screens without significantly degrading perceived quality.
+ * - Sets `antialias={false}` because post-processing (EffectComposer with multisampling)
+ *   or temporal anti-aliasing handles it optimally.
+ *
+ * Responsibilities:
+ * - Scene root context.
+ * - Global post-processing pipeline setup (Bloom, ToneMapping, Vignette).
+ */
 export default function Experience() {
   const carGroupRef = useRef<THREE.Group | null>(null);
 
@@ -46,7 +89,8 @@ export default function Experience() {
     <div className="fixed inset-0 w-full h-full bg-black z-0">
       <Canvas
         shadows
-        dpr={[1, 2]}
+        // Opt: Limiting max dpr strictly to 1.0 to save massive fill-rate and improve performance
+        dpr={[1, 1]}
         gl={{
           powerPreference: "high-performance",
           antialias: false,
@@ -67,7 +111,7 @@ export default function Experience() {
           <LightSweep />
 
           <EffectComposer multisampling={4}>
-            <Bloom luminanceThreshold={1.5} mipmapBlur intensity={1.2} />
+            <Bloom luminanceThreshold={2.0} mipmapBlur intensity={0.4} />
             <Vignette eskil={false} offset={0.1} darkness={1.1} />
             <ToneMapping
               blendFunction={BlendFunction.NORMAL}

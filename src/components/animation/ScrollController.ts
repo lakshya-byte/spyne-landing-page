@@ -3,7 +3,29 @@
 import gsap from "gsap";
 import { MasterTimeline } from "@/components/animations/MasterTimeline";
 
-export type CarPose = {
+/**
+ * ScrollController - The global choreography engine
+ * 
+ * Purpose:
+ * Maps the user's scroll progress (0..10) into discrete animation stages for the Car,
+ * Camera, and Lighting sweeps. It functions as the central nervous system for the 3D experience.
+ * 
+ * Interactions:
+ * - Subscribes to the global `MasterTimeline`.
+ * - Mutates the exported `scrollState` singleton.
+ * - Sub-components (`CameraRig`, `CarChoreography`) read from `scrollState` on `useFrame`.
+ * 
+ * Performance Considerations:
+ * - Avoids React state completely. The 60+ Hz updates are written directly to a standard
+ *   Javascript object (`scrollState`), allowing React components to read without re-rendering.
+ * - Utilizes optimized Lerp calculations over expensive GSAP timelines for the 3D transforms.
+ * 
+ * Responsibilities:
+ * - Define fixed waypoints (`Stages`) for key moments in the scroll journey.
+ * - Calculate micro-movements (drifting, floating) across all frames.
+ */
+
+type CarPose = {
   x: number;
   y: number;
   z: number;
@@ -12,7 +34,7 @@ export type CarPose = {
   rz: number;
 };
 
-export type CameraPose = {
+type CameraPose = {
   x: number;
   y: number;
   z: number;
@@ -21,7 +43,7 @@ export type CameraPose = {
   tz: number;
 };
 
-export type ScrollState = {
+type ScrollState = {
   car: CarPose;
   camera: CameraPose;
   lightSweepX: number;
@@ -45,7 +67,7 @@ function clamp01(t: number) {
   return Math.min(Math.max(t, 0), 1);
 }
 
-export function getScrollSegmentProgress(segmentIndex: number, progress: number) {
+function getScrollSegmentProgress(segmentIndex: number, progress: number) {
   return clamp01(progress - segmentIndex);
 }
 
@@ -58,7 +80,6 @@ export function initScrollController() {
     // Remap 0..10 -> 0..4 so the full choreography spans the entire scroll.
     const stageProgress = (progress / 10) * 4;
 
-    const s0 = ease(getScrollSegmentProgress(0, stageProgress));
     const s1 = ease(getScrollSegmentProgress(1, stageProgress));
     const s2 = ease(getScrollSegmentProgress(2, stageProgress));
     const s3 = ease(getScrollSegmentProgress(3, stageProgress));

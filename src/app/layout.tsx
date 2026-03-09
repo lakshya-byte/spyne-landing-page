@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Public_Sans } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 
-const publicSans = Public_Sans({
-  variable: "--font-public-sans",
+const outfitFont = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
 });
 
@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${publicSans.variable} antialiased bg-black text-white`}
+        className={`${outfitFont.variable} antialiased bg-black text-white`}
       >
         {children}
       </body>

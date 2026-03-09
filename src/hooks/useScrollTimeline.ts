@@ -53,7 +53,7 @@ export function useScrollTimeline() {
             ScrollTrigger.addEventListener("refresh", () => lenis.resize());
         }
 
-        let ctx = gsap.context(() => {
+        const ctx = gsap.context(() => {
             ScrollTrigger.create({
                 trigger: "#scroll-container",
                 start: "top top",

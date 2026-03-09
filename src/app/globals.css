@@ -1,55 +1,169 @@
+/**
+ * globals.css - Global styles and design system for Spyne landing page
+ * 
+ * This file establishes the complete design system including:
+ * - CSS custom properties for theming
+ * - Tailwind CSS configuration with inline theme
+ * - Utility classes for glass-morphism effects
+ * - Responsive design patterns
+ * - Animation and transition utilities
+ * - Scrollbar hiding for clean UI
+ * 
+ * Design System:
+ * - Color palette: Black background with orange primary accent
+ * - Typography: Public Sans font family with optimized smoothing
+ * - Glass effects: Backdrop blur with subtle borders
+ * - Animations: Smooth transitions and micro-interactions
+ * 
+ * Performance:
+ * - Uses CSS transforms for smooth animations
+ * - Optimized font rendering with antialiasing
+ * - Hardware-accelerated backdrop filters
+ * - Efficient scrollbar removal
+ */
 @import "tailwindcss";
 
-@theme inline {
-  --color-background: #050505;
-  --color-foreground: #ffffff;
-  --font-sans: var(--font-public-sans);
-  --font-display: var(--font-public-sans);
-
-  --color-primary: #ec5b13;
-  --color-background-light: #f8f6f6;
-  --color-background-dark: #050505;
-
-  --color-accent-blue: #0ea5e9;
-  --color-accent-red: #ef4444;
-
-  --color-surface-glass: rgba(5, 5, 5, 0.6);
-  --color-surface-border: rgba(255, 255, 255, 0.05);
-
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1.5rem;
+@keyframes eqBounce {
+  0% {
+    height: 30%;
+  }
+  100% {
+    height: 100%;
+  }
+}
+@keyframes shimmer {
+  0% {
+    transform: translateX(-200%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
 }
 
+/**
+ * Inline Tailwind Theme Configuration
+ * 
+ * Defines the complete design token system:
+ * - Colors: Background, foreground, primary, accents
+ * - Typography: Font families and display settings
+ * - Spacing: Border radius for rounded elements
+ * - Surfaces: Glass morphism effects and borders
+ */
+@theme inline {
+  --color-background: #050505; /* Deep black for premium feel */
+  --color-foreground: #ffffff; /* Pure white for contrast */
+  --font-sans: var(--font-outfit);
+  --font-display: var(--font-outfit);
+
+  --color-primary: #ec5b13; /* Brand orange for CTAs and accents */
+  --color-background-light: #f8f6f6; /* Light mode background */
+  --color-background-dark: #050505; /* Dark mode background */
+
+  --color-accent-blue: #0ea5e9; /* Blue accent for secondary actions */
+  --color-accent-red: #ef4444; /* Red accent for warnings/errors */
+
+  --color-surface-glass: rgba(5, 5, 5, 0.6); /* Glass surface with opacity */
+  --color-surface-border: rgba(255, 255, 255, 0.05); /* Subtle glass borders */
+
+  --radius-xl: 0.75rem; /* Large radius for cards and panels */
+  --radius-2xl: 1.5rem; /* Extra large for hero elements */
+}
+
+/**
+ * CSS Custom Properties Root Variables
+ * 
+ * Fallback variables for compatibility and external access
+ * Used by components that can't access Tailwind's theme system
+ */
 :root {
   --background: #050505;
   --foreground: #ffffff;
 }
 
+/**
+ * Base Body Styles
+ * 
+ * Applies global styling to the body element:
+ * - Sets background and foreground colors
+ * - Configures font family with fallbacks
+ * - Disables overscroll behavior for smooth UX
+ * - Enables font smoothing for crisp text rendering
+ */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
-  overscroll-behavior: none;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none; /* Prevents rubber band scrolling */
+  -webkit-font-smoothing: antialiased; /* Crisp text on macOS */
+  -moz-osx-font-smoothing: grayscale; /* Crisp text on Firefox */
 }
 
+/* -------------------------------------------------------------------------- */
+/* ULTIMATE SCROLLBAR REMOVAL (BRUTE FORCE)                                   */
+/* -------------------------------------------------------------------------- */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  -webkit-appearance: none !important;
+}
+
+html,
+body {
+  overflow: auto; /* Required for lenis scroll */
+}
+
+/**
+ * Utility Classes Layer
+ * 
+ * Custom utility classes for specific design patterns:
+ * - Text glow effects for emphasis
+ * - Glass morphism panels and navigation
+ * - Gradient backgrounds for hero sections
+ * - Mask effects for smooth transitions
+ * - Scrollbar hiding for clean UI
+ */
 @layer utilities {
+  /**
+   * Text Glow Effect
+   * Adds subtle white glow to text for premium feel
+   */
   .text-glow {
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
   }
+
+  /**
+   * Glass Navigation Bar
+   * Semi-transparent navigation with backdrop blur
+   */
   .glass-nav {
     background: var(--color-surface-glass);
     border-bottom: 1px solid var(--color-surface-border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
+
+  /**
+   * Glass Panel
+   * General purpose glass morphism container
+   */
   .glass-panel {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
+
+  /**
+   * Hero Gradient Background
+   * Radial gradient for hero section emphasis
+   */
   .hero-gradient {
     background: radial-gradient(
       circle at 50% 40%,
@@ -57,29 +171,44 @@ body {
       rgba(5, 5, 5, 1) 70%
     );
   }
-  .car-reflection {
-    mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0) 80%
-    );
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0) 80%
-    );
-  }
+
+  /**
+   * Hide Scrollbar Utility
+   * Completely hides scrollbar while maintaining scroll functionality
+   * Works across all major browsers
+   */
   .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
   .hide-scrollbar::-webkit-scrollbar {
-    display: none;
+    display: none; /* Chrome, Safari, and Opera */
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
   }
 }
 
+/**
+ * Canvas Base Styles
+ * 
+ * Optimizes canvas elements for touch interactions and performance:
+ * - Disables default touch actions for smooth 3D interactions
+ * - Prevents unwanted browser gestures on canvas elements
+ */
 /* Base resets for canvas */
 canvas {
   touch-action: none;
 }
-

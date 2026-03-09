@@ -11,7 +11,7 @@ const COLORS = [
   { name: "Cobalt Blue", value: "#0ea5e9" },
 ];
 
-export const colorStore = {
+const colorStore = {
   color: COLORS[0].value,
   listeners: new Set<(c: string) => void>(),
   subscribe(fn: (c: string) => void): () => void {

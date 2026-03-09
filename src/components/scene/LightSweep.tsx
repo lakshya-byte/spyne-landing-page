@@ -24,7 +24,7 @@ export default function LightSweep() {
       ref={lightRef}
       width={3.5}
       height={1.6}
-      intensity={12}
+      intensity={2.5}
       color={"#ffffff"}
       position={[-8, 1.2, 2.5]}
       rotation={[0, Math.PI, 0]}

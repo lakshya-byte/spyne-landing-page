@@ -2,7 +2,7 @@
 
 import { PointMaterial, Points } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 export default function ParticleSystem({ tier = 3 }: { tier?: number }) {
@@ -10,18 +10,21 @@ export default function ParticleSystem({ tier = 3 }: { tier?: number }) {
 
   const particleCount = tier === 3 ? 2000 : tier === 2 ? 800 : 0;
 
-  const particlesPosition = useMemo(() => {
-    const positions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-      // Create a volume around the car
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      positions[i * 3] = (Math.random() - 0.5) * 15; // x
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      positions[i * 3 + 1] = Math.random() * 5; // y
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 15; // z
-    }
-    return positions;
+  const [particlesPosition, setParticlesPosition] =
+    useState<Float32Array | null>(null);
+
+  useEffect(() => {
+    if (particleCount === 0) return;
+    const t = setTimeout(() => {
+      const positions = new Float32Array(particleCount * 3);
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 15; // x
+        positions[i * 3 + 1] = Math.random() * 5; // y
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 15; // z
+      }
+      setParticlesPosition(positions);
+    }, 0);
+    return () => clearTimeout(t);
   }, [particleCount]);
 
   useFrame((state) => {
@@ -32,7 +35,7 @@ export default function ParticleSystem({ tier = 3 }: { tier?: number }) {
     }
   });
 
-  if (particleCount === 0) return null;
+  if (particleCount === 0 || !particlesPosition) return null;
 
   return (
     <Points ref={pointsRef} positions={particlesPosition} frustumCulled={false}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import Experience from "@/components/scene/Experience";
 import { useScrollTimeline, scrollStore } from "@/hooks/useScrollTimeline";
 import { useSound } from "@/hooks/useSound";
@@ -19,44 +19,46 @@ import AISalesAssistant from "@/components/ui/sections/AISalesAssistant";
 import PlatformOverview from "@/components/ui/sections/PlatformOverview";
 import FinalCTA from "@/components/ui/sections/FinalCTA";
 
-// Preload assets before rendering
+// UI Components
+import MusicToggle from "@/components/ui/MusicToggle";
+import ChatBot from "@/components/ui/ChatBot";
+import Minimap from "@/components/ui/Minimap";
+
 preloadModels();
 
 export default function Home() {
-  // Initialize scroll tracking
   useScrollTimeline();
   const { playSound } = useSound();
-  const [started, setStarted] = useState(false);
+  const startedRef = useRef(false);
 
   useEffect(() => {
-    // Play startup sound on first scroll interaction
     const unsub = scrollStore.subscribe((p) => {
-      if (p > 0.1 && !started) {
-        setStarted(true);
+      if (p > 0.1 && !startedRef.current) {
+        startedRef.current = true;
         playSound("startup");
         playSound("ambient");
       }
     });
     return unsub;
-  }, [started, playSound]);
+  }, [playSound]);
 
   return (
     <main className="relative bg-black w-full text-foreground selection:bg-primary selection:text-white overflow-hidden">
-      {/* Scroll container (10 segments of 100vh) */}
       <div
         id="scroll-container"
-        className="relative w-full"
+        className="relative w-full hide-scrollbar"
         style={{ height: "1000vh" }}
       >
-        {/* Fixed 3D Canvas */}
         <div className="fixed inset-0 w-full h-full z-0 pointer-events-auto">
           <Experience />
         </div>
 
-        {/* Global Navigation */}
         <Navigation />
+        <Minimap />
 
-        {/* Explicit UI Layout (based on Stitch MCP Design Hierarchy) */}
+        <MusicToggle />
+        <ChatBot />
+
         <div className="fixed inset-0 w-full h-full z-10 pointer-events-none">
           <HeroReveal />
           <FullCarRevealAndAITransformation />

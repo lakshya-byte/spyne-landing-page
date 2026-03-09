@@ -3,6 +3,26 @@
 import { useRef } from "react";
 import * as THREE from "three";
 
+/**
+ * LightingRig - Cinematic studio lighting setup
+ *
+ * Purpose:
+ * Establishes a 4-point studio lighting environment tailored to highlight the contours
+ * and reflective surfaces of the car model.
+ *
+ * Interactions:
+ * - Interacts with the car model's materials via PBR (Physically Based Rendering).
+ * - Softly animated (or capable of being animated) by `LightSweep` for dynamic reflections.
+ *
+ * Performance Considerations:
+ * - Restricts shadow casting to only essential lights (Key and Rim) to reduce depth-map
+ *   render passes.
+ * - Caps shadow map sizes (`shadow-mapSize={[2048, 2048]}`) to balance crispness vs GPU RAM.
+ *
+ * Responsibilities:
+ * - Deliver a premium "showroom" aesthetic.
+ * - Manage global ambient, directional, spot, and point lights.
+ */
 export default function LightingRig() {
   const groupRef = useRef<THREE.Group>(null);
 
