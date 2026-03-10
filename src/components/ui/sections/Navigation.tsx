@@ -21,7 +21,7 @@ export default function Navigation() {
       className="fixed top-0 w-full z-50 glass-nav transition-opacity duration-500"
       style={{ opacity }}
     >
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="text-primary">
             <svg
@@ -38,7 +38,7 @@ export default function Navigation() {
               ></path>
             </svg>
           </div>
-          <span className="text-xl font-black tracking-tighter uppercase text-white">
+          <span className="text-lg md:text-xl font-black tracking-tighter uppercase text-white">
             Spyne
           </span>
         </div>

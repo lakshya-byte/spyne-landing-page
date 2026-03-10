@@ -27,14 +27,28 @@ export default function AISalesAssistant() {
       className={`absolute inset-0 z-10 pointer-events-none transition-opacity duration-1000 ${isVisible ? "opacity-100" : "opacity-0"}`}
     >
       {/* Section Header */}
-      <div className="absolute top-24 left-1/2 -translate-x-1/2 text-center max-w-2xl px-4">
-        <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tighter text-white">
-          AI <span className="text-primary">Sales Assistant</span>
+      <div className="absolute top-24 left-1/2 -translate-x-1/2 text-center w-[calc(100vw-2rem)] max-w-2xl px-2 sm:px-4">
+        <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 md:mb-4 tracking-tighter text-white">
+          Vini AI -{" "}
+          <span className="text-primary">Your Dealership's AI Workforce</span>
         </h2>
-        <p className="text-lg text-slate-400 font-light">
-          Experience interactive AI assistance with our premium chatbot
-          interface. Get instant answers about vehicles, pricing, and features.
-        </p>
+        <div className="grid grid-cols-2 gap-3 mt-8">
+          <div className="text-sm font-semibold text-white bg-white/5 border border-white/10 rounded-lg p-2">
+            Sales Agent
+          </div>
+          <div className="text-sm font-semibold text-white bg-white/5 border border-white/10 rounded-lg p-2">
+            BDC Agent
+          </div>
+          <div className="text-sm font-semibold text-white bg-white/5 border border-white/10 rounded-lg p-2">
+            Service Agent
+          </div>
+          <div className="text-sm font-semibold text-white bg-white/5 border border-white/10 rounded-lg p-2">
+            Parts Agent
+          </div>
+          <div className="text-sm font-semibold text-white bg-white/5 border border-white/10 rounded-lg p-2 col-span-2">
+            Recall Agent
+          </div>
+        </div>
       </div>
 
       {/* Premium ChatBot Component */}

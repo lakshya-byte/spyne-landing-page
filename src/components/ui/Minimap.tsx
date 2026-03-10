@@ -146,7 +146,7 @@ export default function GodTierMinimap() {
 
   return (
     <div
-      className="fixed right-0 top-0 h-screen w-80 z-50 pointer-events-none flex items-center justify-end pr-8 transition-all duration-700 ease-out"
+      className="fixed right-0 top-0 h-screen w-16 sm:w-32 md:w-80 z-50 pointer-events-none flex items-center justify-end pr-2 md:pr-8 transition-all duration-700 ease-out"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -219,7 +219,7 @@ export default function GodTierMinimap() {
               ref={(el) => {
                 (labelsRef.current as any)[idx] = el;
               }}
-              className="mr-8 flex flex-col justify-center items-end opacity-0 translate-x-5 blur-[4px] transition-all duration-500 ease-out pointer-events-none z-[1]"
+              className="hidden md:flex mr-8 flex-col justify-center items-end opacity-0 translate-x-5 blur-[4px] transition-all duration-500 ease-out pointer-events-none z-[1]"
             >
               <div className="flex items-end justify-end gap-3">
                 <span className="text-[11px] font-bold text-white tracking-[0.2em] uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-none text-right">

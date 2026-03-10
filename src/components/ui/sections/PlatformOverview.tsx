@@ -16,38 +16,36 @@ export default function PlatformOverview() {
     <div
       className={`absolute inset-0 z-10 pointer-events-none transition-opacity duration-1000 ${isVisible ? "opacity-100" : "opacity-0"}`}
     >
-      <div className="absolute top-1/3 left-12 lg:left-24 max-w-sm">
-        <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tighter text-white">
-          The <span className="text-primary">Ultimate</span> Platform
+      <div className="absolute top-1/3 left-4 sm:left-12 lg:left-24 max-w-[calc(100vw-2rem)] sm:max-w-sm">
+        <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 md:mb-4 tracking-tighter text-white">
+          Enterprise-grade <span className="text-primary">Everything</span>
         </h2>
         <p className="text-lg text-slate-400 font-light mb-8">
-          Manage, process, and distribute cinematic 3D listings anywhere on the
-          web, directly from your browser.
+          More secure than using ChatGPT, Gemini, and others directly.
         </p>
 
         <div className="flex flex-col gap-4 pointer-events-auto">
           <div className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-md">
             <h3 className="text-white font-bold mb-1 flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-sm">
-                cloud_done
+                security
               </span>{" "}
-              API Access
+              99.99% Uptime
             </h3>
             <p className="text-sm text-slate-400">
-              Integrate our engine directly into your existing CRM or inventory
-              tool.
+              Reliable platform delivering consistent performance for your
+              dealership.
             </p>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-md">
             <h3 className="text-white font-bold mb-1 flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-sm">
-                speed
+                support_agent
               </span>{" "}
-              Ultra Fast Delivery
+              24/7 Support
             </h3>
             <p className="text-sm text-slate-400">
-              Web-optimized GLTF streaming formats adapt instantly to the
-              user&apos;s connection.
+              SOC 2 TYPE II, ISO 27001, and GDPR compliant.
             </p>
           </div>
         </div>

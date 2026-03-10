@@ -118,7 +118,7 @@ export default function ChatBot() {
 
   return (
     <div
-      className={`fixed bottom-12 right-12 z-40 flex flex-col items-end transition-opacity duration-500 ${isMounted ? "opacity-100" : "opacity-0"}`}
+      className={`fixed bottom-4 right-4 md:bottom-12 md:right-12 z-40 flex flex-col items-end transition-opacity duration-500 ${isMounted ? "opacity-100" : "opacity-0"}`}
     >
       {/* FAB Button (when closed) */}
       {!isOpen && (
@@ -145,7 +145,7 @@ export default function ChatBot() {
 
       {/* Chat Container (when open) */}
       {isOpen && (
-        <div className="w-96 max-w-[calc(100vw-2rem)] bg-[#0a0a0a]/95 border border-white/10 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-2xl h-[600px] max-h-[80vh] flex flex-col pointer-events-auto animate-fade-in origin-bottom-right">
+        <div className="w-full sm:w-96 min-w-[300px] bg-[#0a0a0a]/95 border border-white/10 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-2xl h-[500px] md:h-[600px] max-h-[85vh] flex flex-col pointer-events-auto animate-fade-in origin-bottom-right">
           {/* Header */}
           <div className="glass-nav border-b border-white/10 p-4 flex items-center justify-between shrink-0">
             <div className="flex items-center space-x-3">
