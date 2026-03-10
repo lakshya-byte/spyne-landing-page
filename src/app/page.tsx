@@ -1,7 +1,5 @@
 "use client";
 
-
-
 import { useEffect, useState } from "react";
 
 import Experience from "@/components/scene/Experience";
@@ -9,10 +7,6 @@ import Experience from "@/components/scene/Experience";
 import { useScrollTimeline, scrollStore } from "@/hooks/useScrollTimeline";
 
 import { useSound } from "@/hooks/useSound";
-
-import { preloadModels } from "@/lib/modelLoader";
-
-
 
 // Stitch MCP Sections
 
@@ -38,82 +32,52 @@ import PlatformOverview from "@/components/ui/sections/PlatformOverview";
 
 import FinalCTA from "@/components/ui/sections/FinalCTA";
 
-
-
 // UI Components
-
 import MusicToggle from "@/components/ui/MusicToggle";
-
-
-
-preloadModels();
-
-
+import ChatBot from "@/components/ui/ChatBot";
+import GodTierMinimap from "@/components/ui/Minimap";
 
 export default function Home() {
-
   useScrollTimeline();
 
   const { playSound } = useSound();
 
   const [started, setStarted] = useState(false);
 
-
-
   useEffect(() => {
-
     const unsub = scrollStore.subscribe((p) => {
-
       if (p > 0.1 && !started) {
-
         setStarted(true);
 
         playSound("startup");
 
         playSound("ambient");
-
       }
-
     });
 
     return unsub;
-
   }, [started, playSound]);
 
-
-
   return (
-
     <main className="relative bg-black w-full text-foreground selection:bg-primary selection:text-white overflow-hidden">
-
       <div
-
         id="scroll-container"
-
         className="relative w-full hide-scrollbar"
-
         style={{ height: "1000vh" }}
-
       >
-
         <div className="fixed inset-0 w-full h-full z-0 pointer-events-auto">
-
           <Experience />
-
         </div>
-
-
 
         <Navigation />
 
-
-
         <MusicToggle />
 
+        <ChatBot />
 
+        <GodTierMinimap />
 
         <div className="fixed inset-0 w-full h-full z-10 pointer-events-none">
-
           <HeroReveal />
 
           <FullCarRevealAndAITransformation />
@@ -133,14 +97,8 @@ export default function Home() {
           <PlatformOverview />
 
           <FinalCTA />
-
         </div>
-
       </div>
-
     </main>
-
   );
-
 }
-

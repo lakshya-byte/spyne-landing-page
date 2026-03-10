@@ -12,7 +12,7 @@ export default function ReflectionSystem() {
       <planeGeometry args={[100, 100]} />
       <MeshReflectorMaterial
         blur={[300, 100]}
-        resolution={1024}
+        resolution={512}
         mixBlur={1}
         mixStrength={80}
         roughness={0.1}

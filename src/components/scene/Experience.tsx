@@ -25,17 +25,24 @@ import {
 } from "@/components/animation/ScrollController";
 
 /**
- * CarChoreography
+ * CarChoreography — 3D car motion bridge
  *
  * Purpose:
- * Synchronizes the 3D car model's position and rotation with the global scroll state.
+ * Internal R3F component that reads the `scrollState.car` singleton every frame
+ * and applies it directly to the THREE.Group wrapping the loaded GLTF scene.
  *
  * Interactions:
- * - Reads `scrollState.car` on every frame.
+ * - `scrollState` is mutated by `ScrollController` which subscribes to the global
+ *   MasterTimeline (scroll progress 0→10).
+ * - The `carGroupRef` is shared with `<Experience>` and points to the GLTF wrapper group.
  *
  * Performance Considerations:
- * - Mutates the THREE.Group properties directly inside `useFrame`.
- * - Allocates ZERO new objects per frame to prevent Garbage Collection (GC) stutters.
+ * - Direct mutation of `position.set` / `rotation.set` inside `useFrame`.
+ * - Zero new THREE object allocations per frame → no GC pressure.
+ * - Entirely bypasses React reconciliation (no state, no props change).
+ *
+ * Responsibilities:
+ * - Translate scroll progress into smooth 3D car pose (position + rotation).
  */
 function CarChoreography({
   carGroupRef,
@@ -46,7 +53,6 @@ function CarChoreography({
     const g = carGroupRef.current;
     if (!g) return;
     const car = scrollState.car;
-    // Direct mutation - highly performant, avoids React reconciliation
     g.position.set(car.x, car.y, car.z);
     g.rotation.set(car.rx, car.ry, car.rz);
   });
@@ -54,26 +60,30 @@ function CarChoreography({
 }
 
 /**
- * Experience - The core WebGL scene wrapper
+ * Experience — Core WebGL scene root
  *
  * Purpose:
- * Initializes the React Three Fiber <Canvas> and orchestrates all 3D scene elements
- * (lighting, models, post-processing, and environment).
+ * Initializes the React Three Fiber `<Canvas>` and orchestrates every 3D element:
+ * lighting, the Porsche model, post-processing, and the scroll animation controller.
  *
  * Interactions:
- * - Unifies `CameraRig`, `LightingRig`, `Environment`, and `CarModel`.
- * - Initializes the `ScrollController` on mount to bind GSAP scroll timelines.
+ * - `initScrollController()` subscribes to MasterTimeline (scroll 0→10) and writes
+ *   the `scrollState` singleton; returns an unsubscribe fn for cleanup.
+ * - Children: CameraRig, LightingRig, Environment, CarModel, CarChoreography,
+ *   ReflectionSystem, ParticleSystem, LightSweep, EffectComposer.
  *
  * Performance Considerations:
- * - Uses `powerPreference="high-performance"` to request discrete GPUs on dual-GPU systems.
- * - Caps Device Pixel Ratio (`dpr={[1, 1.5]}`) instead of `[1, 2]` to drastically reduce
- *   fill rate usage on 4K/high-DPI screens without significantly degrading perceived quality.
- * - Sets `antialias={false}` because post-processing (EffectComposer with multisampling)
- *   or temporal anti-aliasing handles it optimally.
+ * - `frameloop="always"` — required for continuous scroll-driven + idle animation.
+ *   Previously `"demand"` was breaking all per-frame car choreography.
+ * - `dpr={[1, 1.5]}` — caps Pixel Ratio to reduce fill-rate cost on HiDPI screens.
+ * - `antialias={false}` — MSAA delegated to EffectComposer (multisampling={2}).
+ * - `stencil={false}` — eliminates the stencil buffer to save VRAM.
+ * - `powerPreference="high-performance"` — requests discrete GPU on dual-GPU systems.
  *
  * Responsibilities:
- * - Scene root context.
- * - Global post-processing pipeline setup (Bloom, ToneMapping, Vignette).
+ * - WebGL renderer configuration and canvas mounting.
+ * - Post-processing pipeline: Bloom → Vignette → ToneMapping.
+ * - ScrollController lifecycle management.
  */
 export default function Experience() {
   const carGroupRef = useRef<THREE.Group | null>(null);
@@ -89,8 +99,8 @@ export default function Experience() {
     <div className="fixed inset-0 w-full h-full bg-black z-0">
       <Canvas
         shadows
-        // Opt: Limiting max dpr strictly to 1.0 to save massive fill-rate and improve performance
-        dpr={[1, 1]}
+        frameloop="always"
+        dpr={[1, 1.5]}
         gl={{
           powerPreference: "high-performance",
           antialias: false,
@@ -110,7 +120,7 @@ export default function Experience() {
           <ParticleSystem />
           <LightSweep />
 
-          <EffectComposer multisampling={4}>
+          <EffectComposer multisampling={2}>
             <Bloom luminanceThreshold={2.0} mipmapBlur intensity={0.4} />
             <Vignette eskil={false} offset={0.1} darkness={1.1} />
             <ToneMapping

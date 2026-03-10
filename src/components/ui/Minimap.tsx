@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { scrollStore } from "@/hooks/useScrollTimeline";
 
-// Complete cinematic scroll timeline divided into 10 immersive steps
+/**
+ * SECTIONS — Scroll Timeline Manifest
+ *
+ * Maps to the page's 10-segment scroll journey (progress 0→10).
+ * Drives the minimap's labels and click-to-navigate behaviour.
+ */
 const SECTIONS = [
   { id: "01", title: "HERO REVEAL", subtitle: "Ignition Sequence" },
   { id: "02", title: "TRANSFORMATION", subtitle: "AI Mesh Formation" },
@@ -18,11 +23,28 @@ const SECTIONS = [
 ];
 
 /**
- * GodTierMinimap
+ * GodTierMinimap — Premium right-side scroll timeline navigator
  *
- * An Awwwards-level interactive scroll minimap.
- * Automatically synchronizes with the GSAP ScrollTrigger timeline via `scrollStore`.
- * Modifies the DOM directly via refs at 60+ FPS to bypass React state overhead.
+ * Purpose:
+ * A fixed, right-side minimap giving users a cinematic overview of the page
+ * structure and their current position within the scroll journey.
+ *
+ * Interactions:
+ * - Subscribes to `scrollStore` for real-time scroll progress (0→10).
+ * - Imperatively mutates DOM refs for all per-frame visual updates, bypassing
+ *   React re-renders entirely for smooth 60+ FPS performance.
+ * - `scrollToSegment(idx)` calls `window.scrollTo`; Lenis intercepts and smooths it.
+ *
+ * Performance Considerations:
+ * - Only `isHovered` (mouse enter/leave) triggers a React re-render.
+ * - All progress updates are pure DOM mutations — zero reconciliation overhead.
+ * - The glass backdrop uses CSS transitions (GPU-composited) for the hover anim.
+ *
+ * Responsibilities:
+ * - Visual fill track + scrubber head indicating scroll depth.
+ * - Per-section node dots with active/current state styling.
+ * - Cinematic label overlay on hover.
+ * - Click-to-jump navigation for each section.
  */
 export default function GodTierMinimap() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,52 +53,35 @@ export default function GodTierMinimap() {
   const scrubberCoreRef = useRef<HTMLDivElement>(null);
   const percentageRef = useRef<HTMLDivElement>(null);
 
-  // Store refs for each interactive node and its corresponding label
   const nodesRef = useRef<(HTMLButtonElement | null)[]>([]);
   const labelsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  // State used exclusively for the glassmorphic background hover expansion
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    // Subscribe to the global scroll timeline (Progress ranges from 0.0 to 10.0)
     const unsubscribe = scrollStore.subscribe((p) => {
-      // 1. Calculate global percentage (0% to 100%)
       const rawPercent = (p / 10) * 100;
       const percent = Math.min(100, Math.max(0, rawPercent));
 
-      // 2. Animate the core progress scrubber line
-      if (trackFillRef.current) {
+      if (trackFillRef.current)
         trackFillRef.current.style.height = `${percent}%`;
-      }
-      if (scrubberGlowRef.current) {
+      if (scrubberGlowRef.current)
         scrubberGlowRef.current.style.top = `${percent}%`;
-      }
-      if (scrubberCoreRef.current) {
+      if (scrubberCoreRef.current)
         scrubberCoreRef.current.style.top = `${percent}%`;
-      }
-
-      // 3. Update the floating numeric percentage text
       if (percentageRef.current) {
         percentageRef.current.innerText = `${Math.min(100, Math.round(percent)).toString().padStart(3, "0")}%`;
       }
 
-      // 4. Update individual nodes (10 sections spaced equally)
-      // Since Sections length is 10, there are 9 intervals to cover the 0-10 domain.
       const segmentSpacing = 10 / (SECTIONS.length - 1);
 
       nodesRef.current.forEach((node, i) => {
         if (!node) return;
-
         const targetP = i * segmentSpacing;
         const distance = Math.abs(p - targetP);
-
-        // Node is considered "Active" once the scroll passes it
         const isActive = p >= targetP - 0.05;
-        // Node is considered "Current/Focused" when the scrubber is perfectly aligned
         const isCurrent = distance < segmentSpacing * 0.5;
 
-        // Stylize the Node dot
         if (isActive) {
           node.classList.add(
             "bg-white",
@@ -109,10 +114,8 @@ export default function GodTierMinimap() {
           );
         }
 
-        // Stylize the corresponding Label text
         const label = labelsRef.current[i];
         if (label) {
-          // Keep label visible if it's the current section, OR if the whole menu is hovered
           if (isCurrent || isHovered) {
             label.style.opacity = isCurrent ? "1" : "0.5";
             label.style.transform = "translateX(0px)";
@@ -130,18 +133,12 @@ export default function GodTierMinimap() {
   }, [isHovered]);
 
   const scrollToSegment = (idx: number) => {
-    // Compute the exact target Y scroll position
     const segmentSpacing = 10 / (SECTIONS.length - 1);
     const targetP = idx * segmentSpacing;
     const maxScroll =
       document.documentElement.scrollHeight - window.innerHeight;
     const targetScrollY = (targetP / 10) * maxScroll;
-
-    // Trigger a smooth scroll, which GSAP/Lenis will automatically interpolate
-    window.scrollTo({
-      top: targetScrollY,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: targetScrollY, behavior: "smooth" });
   };
 
   return (
@@ -150,12 +147,9 @@ export default function GodTierMinimap() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* 
-        Glassmorphic Hover Backdrop 
-        Fades in gracefully behind the minimap text when hovered to ensure perfect readability. 
-      */}
+      {/* Glassmorphic hover backdrop fades in behind labels for readability */}
       <div
-        className={`absolute right-0 top-0 h-full w-full bg-gradient-to-l from-black/80 via-black/40 to-transparent backdrop-blur-md transition-all duration-700 ease-out ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
+        className={`absolute right-0 top-0 h-full w-full bg-linear-to-l from-black/80 via-black/40 to-transparent backdrop-blur-md transition-all duration-700 ease-out ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
         style={{
           maskImage: "linear-gradient(to left, black 40%, transparent 100%)",
           WebkitMaskImage:
@@ -167,29 +161,29 @@ export default function GodTierMinimap() {
         ref={containerRef}
         className="relative h-[70vh] w-full pointer-events-auto flex items-center justify-end"
       >
-        {/* The Track Container */}
+        {/* Vertical track rail with animated fill */}
         <div className="absolute right-0 top-0 w-[2px] h-full bg-white/10 rounded-full overflow-hidden shadow-[inset_0_0_5px_rgba(0,0,0,1)]">
-          {/* Expanding Fill Line */}
           <div
             ref={trackFillRef}
-            className="absolute top-0 right-0 w-full bg-gradient-to-b from-primary via-orange-400 to-white shadow-[0_0_20px_rgba(236,91,19,0.8)] transition-all duration-75 ease-linear rounded-full"
+            className="absolute top-0 right-0 w-full bg-linear-to-b from-primary via-orange-400 to-white shadow-[0_0_20px_rgba(236,91,19,0.8)] transition-all duration-75 ease-linear rounded-full"
             style={{ height: "0%" }}
           />
         </div>
 
-        {/* Floating Glowing Scrubber Dots */}
+        {/* Scrubber glow halo */}
         <div
           ref={scrubberGlowRef}
           className="absolute right-[-5px] w-3 h-3 bg-primary/40 rounded-full blur-[4px] transition-all duration-75 ease-linear pointer-events-none"
           style={{ top: "0%", transform: "translateY(-50%)" }}
         />
+        {/* Scrubber core dot */}
         <div
           ref={scrubberCoreRef}
           className="absolute right-[-2px] w-[6px] h-[6px] bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,1)] transition-all duration-75 ease-linear pointer-events-none"
           style={{ top: "0%", transform: "translateY(-50%)" }}
         />
 
-        {/* Nodes and Labels */}
+        {/* Section nodes */}
         {SECTIONS.map((section, idx) => (
           <div
             key={section.id}
@@ -203,10 +197,10 @@ export default function GodTierMinimap() {
             tabIndex={0}
             onKeyDown={(e) => e.key === "Enter" && scrollToSegment(idx)}
           >
-            {/* Expanded Hitbox */}
+            {/* Expanded invisible tap/click target */}
             <div className="absolute right-[-16px] w-12 h-10 bg-transparent z-10" />
 
-            {/* Scale-animated Node Dot */}
+            {/* Animated node dot — tiny when inactive, full when active */}
             <div
               ref={(el) => {
                 (nodesRef.current as any)[idx] = el;
@@ -214,7 +208,7 @@ export default function GodTierMinimap() {
               className="absolute right-[-4px] w-[10px] h-[10px] bg-white/20 rounded-full scale-[0.3] transition-all duration-500 ease-out z-[2]"
             />
 
-            {/* Cinematic Typography Label */}
+            {/* Section label — hidden on mobile, shown on hover or when current */}
             <div
               ref={(el) => {
                 (labelsRef.current as any)[idx] = el;
@@ -236,9 +230,9 @@ export default function GodTierMinimap() {
           </div>
         ))}
 
-        {/* Subdued Percentage Indicator at the bottom */}
+        {/* Percentage indicator below the track */}
         <div className="absolute -bottom-20 right-[-12px] flex flex-col items-center justify-center opacity-40">
-          <div className="h-10 w-[1px] bg-gradient-to-b from-white/30 to-transparent mb-3" />
+          <div className="h-10 w-[1px] bg-linear-to-b from-white/30 to-transparent mb-3" />
           <div
             ref={percentageRef}
             className="text-[10px] font-mono tracking-[0.4em] font-bold text-white/60 -rotate-90 translate-y-3 translate-x-[-1px] transform-origin-center"

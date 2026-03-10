@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { scrollStore } from "@/hooks/useScrollTimeline";
-import ChatBot from "@/components/ui/ChatBot";
 
 /**
  * AISalesAssistant Section - Enhanced with Premium ChatBot UI
@@ -50,9 +49,6 @@ export default function AISalesAssistant() {
           </div>
         </div>
       </div>
-
-      {/* Premium ChatBot Component */}
-      <ChatBot />
     </div>
   );
 }
