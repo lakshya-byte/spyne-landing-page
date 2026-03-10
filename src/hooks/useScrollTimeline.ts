@@ -21,6 +21,18 @@ export const scrollStore = {
     }
 };
 
+/**
+ * useScrollTimeline - Core Scroll Trigger synchronization
+ * 
+ * Purpose:
+ * Binds GSAP ScrollTrigger to the Lenis smooth scroll instance and standardizes scroll progress
+ * into a global React-agnostic 0-10 metric via `scrollStore`.
+ * 
+ * Interactions:
+ * - Mutates `scrollStore` which is subscribed to by the main 3D controller (`ScrollController`).
+ * - Updates Lenis internal state whenever GSAP ScrollTrigger updates.
+ * - Forces GSAP to read scroll positions from Lenis instead of the native window scroll.
+ */
 export function useScrollTimeline() {
     const lenisRef = useLenisScroll({ lerp: 0.08 });
 

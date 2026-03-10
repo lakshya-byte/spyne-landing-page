@@ -4,8 +4,19 @@ import { useState, useEffect } from "react";
 import { useSound } from "@/hooks/useSound";
 
 /**
- * MusicToggle - production stable
- * keeps UI identical
+ * MusicToggle - Global Audio Control
+ *
+ * Purpose:
+ * Renders an abstract, animated equalizer button that allows the user to play/pause
+ * the persistent background ambient audio.
+ *
+ * Interactions:
+ * - Uses the `useSound` hook to trigger `playSound` and `pauseSound` globally.
+ * - Reads `isAmbientPlaying` to accurately display the equalizer animation state.
+ *
+ * Usage:
+ * Placed as a fixed element in the root `page.tsx` so audio can be controlled
+ * regardless of scroll position.
  */
 
 export default function MusicToggle() {

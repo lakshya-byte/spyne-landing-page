@@ -5,6 +5,24 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
+/**
+ * ParticleSystem - Ambient generative dust and atmosphere
+ *
+ * Purpose:
+ * Renders a highly optimized field of generic floating particles to give
+ * depth, scale, and atmosphere to the 3D scene.
+ *
+ * Interactions:
+ * - Slowly rotates and undulates on the Y-axis inside `useFrame`.
+ * - Receives a `tier` prop (defaults to 3) which determines density.
+ *
+ * Performance Considerations:
+ * - Uses `THREE.Points` combined with a `Float32Array` instead of
+ *   individual meshes. This is critical for maintaining 60fps while rendering
+ *   thousands of elements.
+ * - Initialization is deferred via `setTimeout` to not block the main thread
+ *   during mount.
+ */
 export default function ParticleSystem({ tier = 3 }: { tier?: number }) {
   const pointsRef = useRef<THREE.Points>(null);
 

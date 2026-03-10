@@ -5,6 +5,18 @@ import { useProgress } from "@react-three/drei";
 
 /**
  * LoadingScreen - Cinematic Speedometer HUD for Spyne App
+ *
+ * Purpose:
+ * Overlays a full-screen, visually intensive "HUD" loading screen while the massive
+ * 3D Porsche GLTF asset and environment textures are downloaded and parsed by React Three Fiber.
+ *
+ * Interactions:
+ * - Reads `progress` and `active` states from `@react-three/drei`'s `useProgress`.
+ * - Maintains an artificial minimum display time (2.5s) to ensure the cinematic animation
+ *   completes before revealing the actual 3D scene.
+ *
+ * Usage:
+ * Mounts at the very top level in `page.tsx` with a high z-index, fading out automatically.
  */
 export default function LoadingScreen() {
   const { progress, active } = useProgress();

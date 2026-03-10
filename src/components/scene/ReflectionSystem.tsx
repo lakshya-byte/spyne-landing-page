@@ -2,6 +2,18 @@
 
 import { MeshReflectorMaterial } from "@react-three/drei";
 
+/**
+ * ReflectionSystem - Ground Plane Studio Reflection
+ *
+ * Purpose:
+ * Renders an infinite, subtle, and realistic ground reflection that anchors
+ * the 3D car model within the virtual studio space.
+ *
+ * Performance Considerations:
+ * - Uses Drei's `MeshReflectorMaterial` rendering a secondary camera pass.
+ * - Caps resolution at `512` to prevent immense GPU overhead.
+ * - High `metalness` and `mirror` give it a polished showroom floor feel.
+ */
 export default function ReflectionSystem() {
   return (
     <mesh

@@ -1,5 +1,18 @@
 "use client";
 
+/**
+ * useSound - Global audio management hook
+ * 
+ * Purpose:
+ * Provides a React integration for Howler.js, managing ambient tracks and SFX throughout
+ * the application. Also manages autoplay rules and syncs audio state across components.
+ * 
+ * Interactions:
+ * - Emits state changes via `playingSubscribers` so disparate UI components (like `MusicToggle`)
+ *   can reflect the correct play/pause state instantly.
+ * - Stores actual audio instances in a singleton (`globalSounds`) to ensure audio persists
+ *   across component unmounts and page navigation without cutting out.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { Howl, Howler } from "howler";
 

@@ -5,6 +5,22 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { scrollState } from "@/components/animation/ScrollController";
 
+/**
+ * LightSweep - Dynamic environmental lighting
+ *
+ * Purpose:
+ * Renders a `RectAreaLight` that physically sweeps across the car model
+ * during specific scroll segments (Stages 2..4) to highlight its metallic
+ * paint and aggressive body lines.
+ *
+ * Interactions:
+ * - Subscribes to `scrollState.lightSweepX` which is updated by the `ScrollController`.
+ * - Direct mutation of light position via `useFrame` for performance.
+ *
+ * Performance:
+ * - Employs a single `RectAreaLight` which is relatively expensive in WebGL,
+ *   but avoids shadow casting to maintain frame rates.
+ */
 export default function LightSweep() {
   const lightRef = useRef<THREE.RectAreaLight>(null);
 

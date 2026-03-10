@@ -1,3 +1,13 @@
+/**
+ * RootLayout - Next.js application wrapper
+ *
+ * Purpose:
+ * Provides global HTML structure, injects standard meta tags, and loads the
+ * custom Outfit font across the entire site. Also enforces the `dark` theme by default.
+ *
+ * Usage:
+ * Automatically loaded by Next.js as the global application layout.
+ */
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";

@@ -7,6 +7,19 @@ type LenisOptions = {
   lerp?: number;
 };
 
+/**
+ * useLenisScroll - Smooth scrolling implementation
+ * 
+ * Purpose:
+ * Connects Lenis to the React lifecycle using a standard `requestAnimationFrame` loop.
+ * Bypasses native scroll judder and provides a buttery smooth scrolling experience.
+ * 
+ * Usage:
+ * Instantiated within `useScrollTimeline` to synchronize GSAP scroll triggers with Lenis.
+ * 
+ * Dependencies:
+ * - `lenis`: Core library for smooth scroll calculation.
+ */
 export function useLenisScroll(options: LenisOptions = {}) {
   const lenisRef = useRef<Lenis | null>(null);
 
