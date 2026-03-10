@@ -36,6 +36,7 @@ import FinalCTA from "@/components/ui/sections/FinalCTA";
 import MusicToggle from "@/components/ui/MusicToggle";
 import ChatBot from "@/components/ui/ChatBot";
 import GodTierMinimap from "@/components/ui/Minimap";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 
 export default function Home() {
   useScrollTimeline();
@@ -60,6 +61,8 @@ export default function Home() {
 
   return (
     <main className="relative bg-black w-full text-foreground selection:bg-primary selection:text-white overflow-hidden">
+      <LoadingScreen />
+
       <div
         id="scroll-container"
         className="relative w-full hide-scrollbar"

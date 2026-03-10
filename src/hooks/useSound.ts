@@ -1,22 +1,6 @@
 "use client";
 
-/**
- * useSound - Audio management hook for the Spyne landing page
- * 
- * Provides centralized audio control with Howler.js integration:
- * - Startup sounds for user interactions
- * - Click feedback for UI elements
- * - Ambient background music with loop capability
- * - Volume control and sound asset management
- * 
- * Features:
- * - Automatic cleanup on unmount
- * - Local audio asset integration
- * - Type-safe sound playback
- * - Memory-efficient sound management
- */
-
-import { useEffect, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Howl, Howler } from "howler";
 
 // Local sound assets from public directory
@@ -26,57 +10,92 @@ const SOUND_ASSETS = {
     ambient: "/penguinmusic-lazy-day-stylish-futuristic-chill-239287 (1).mp3",
 };
 
+// Singleton storage for audio instances
+let globalSounds: Record<keyof typeof SOUND_ASSETS, Howl> | null = null;
+
+// Global state tracking for UI sync
+let globalIsAmbientPlaying = false;
+const playingSubscribers = new Set<(playing: boolean) => void>();
+
+function notifySubscribers() {
+    playingSubscribers.forEach((fn) => fn(globalIsAmbientPlaying));
+}
+
+function initSounds() {
+    if (typeof window === "undefined" || globalSounds) return;
+
+    // Initialize global audio instances
+    globalSounds = {
+        startup: new Howl({ src: [SOUND_ASSETS.startup], volume: 0.5 }),
+        click: new Howl({ src: [SOUND_ASSETS.click], volume: 0.2 }),
+        ambient: new Howl({
+            src: [SOUND_ASSETS.ambient],
+            loop: true,
+            volume: 0.1,
+            autoplay: true, // Will attempt to autoplay, fallback to first-interaction unlock natively via Howler
+            onplay: () => {
+                globalIsAmbientPlaying = true;
+                notifySubscribers();
+            },
+            onpause: () => {
+                globalIsAmbientPlaying = false;
+                notifySubscribers();
+            },
+            onstop: () => {
+                globalIsAmbientPlaying = false;
+                notifySubscribers();
+            },
+            onend: () => {
+                // Should loop, but just in case
+                if (!globalSounds?.ambient.loop()) {
+                    globalIsAmbientPlaying = false;
+                    notifySubscribers();
+                }
+            }
+        }),
+    };
+
+    // Check if autoplay succeeded immediately
+    if (globalSounds.ambient.playing()) {
+        globalIsAmbientPlaying = true;
+        notifySubscribers();
+    }
+}
+
 /**
  * Custom hook for managing audio playback throughout the application
- * 
- * @returns {Object} Audio control interface
- * @returns {Function} playSound - Function to play specific sound by name
- * 
- * @example
- * ```tsx
- * const { playSound } = useSound();
- * playSound("startup"); // Plays startup sound
- * ```
  */
 export function useSound() {
-    // Ref to store Howl instances for each sound type
-    const sounds = useRef<{ [key: string]: Howl }>({});
+    const [isAmbientPlaying, setIsAmbientPlaying] = useState(globalIsAmbientPlaying);
 
-    // Initialize sound instances on component mount
     useEffect(() => {
-        sounds.current = {
-            startup: new Howl({ src: [SOUND_ASSETS.startup], volume: 0.5 }),
-            click: new Howl({ src: [SOUND_ASSETS.click], volume: 0.2 }),
-            ambient: new Howl({ src: [SOUND_ASSETS.ambient], loop: true, volume: 0.1 }),
-        };
+        initSounds();
 
-        // Cleanup function to prevent memory leaks
+        // Sync state across components
+        const handleStateChange = (playing: boolean) => setIsAmbientPlaying(playing);
+        playingSubscribers.add(handleStateChange);
+
+        // Immediately trigger with current state in case it started before mount
+        handleStateChange(globalIsAmbientPlaying);
+
         return () => {
-            Howler.unload();
+            playingSubscribers.delete(handleStateChange);
         };
     }, []);
 
-    /**
-     * Play a specific sound by name
-     * 
-     * @param {keyof typeof SOUND_ASSETS} name - The name of the sound to play
-     */
-    const playSound = (name: keyof typeof SOUND_ASSETS) => {
-        if (sounds.current[name] && !sounds.current[name].playing()) {
-            sounds.current[name].play();
+    const playSound = useCallback((name: keyof typeof SOUND_ASSETS) => {
+        if (!globalSounds) initSounds();
+        if (globalSounds?.[name] && !globalSounds[name].playing()) {
+            globalSounds[name].play();
         }
-    };
+    }, []);
 
-    /**
-     * Pause a specific sound by name
-     * 
-     * @param {keyof typeof SOUND_ASSETS} name - The name of the sound to pause
-     */
-    const pauseSound = (name: keyof typeof SOUND_ASSETS) => {
-        if (sounds.current[name] && sounds.current[name].playing()) {
-            sounds.current[name].pause();
+    const pauseSound = useCallback((name: keyof typeof SOUND_ASSETS) => {
+        if (!globalSounds) return;
+        if (globalSounds?.[name] && globalSounds[name].playing()) {
+            globalSounds[name].pause();
         }
-    };
+    }, []);
 
-    return { playSound, pauseSound };
+    return { playSound, pauseSound, isAmbientPlaying };
 }

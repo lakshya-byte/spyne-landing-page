@@ -118,7 +118,7 @@ export default function ChatBot() {
 
   return (
     <div
-      className={`fixed bottom-2 right-2 md:bottom-8 md:right-8 z-40 flex flex-col items-end transition-opacity duration-500 ${isMounted ? "opacity-100" : "opacity-0"}`}
+      className={`fixed bottom-6 right-6 md:bottom-12 md:right-12 z-40 flex flex-col items-end transition-opacity duration-500 ${isMounted ? "opacity-100" : "opacity-0"}`}
     >
       {/* FAB Button (when closed) */}
       {!isOpen && (

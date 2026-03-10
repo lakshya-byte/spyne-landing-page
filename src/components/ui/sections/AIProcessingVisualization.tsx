@@ -28,13 +28,6 @@ export default function AIProcessingVisualization() {
           more sales
         </p>
       </div>
-
-      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-4">
-        <div className="w-2 h-2 rounded-full bg-primary animate-ping"></div>
-        <p className="text-sm tracking-[0.2em] uppercase font-medium text-slate-300">
-          Processing Geometry
-        </p>
-      </div>
     </div>
   );
 }

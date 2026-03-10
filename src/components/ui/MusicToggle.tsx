@@ -4,36 +4,31 @@ import { useState, useEffect } from "react";
 import { useSound } from "@/hooks/useSound";
 
 /**
- * MusicToggle - Aesthetic music control button with glass-morphism design
- *
- * Features:
- * - Smooth play/pause equalizer animations
- * - Premium glass-morphism visual effects
- * - Tactile interaction feedback
- * - Proper z-index layering
+ * MusicToggle - production stable
+ * keeps UI identical
  */
-export default function MusicToggle() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const { playSound, pauseSound } = useSound();
 
-  // Initialize music state
+export default function MusicToggle() {
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  const { playSound, pauseSound, isAmbientPlaying: isPlaying } = useSound();
+
   useEffect(() => {
     const t = setTimeout(() => setIsInitialized(true), 0);
     return () => clearTimeout(t);
   }, []);
 
-  /**
-   * Toggle music playback with smooth transitions
-   */
   const toggleMusic = () => {
-    playSound("click"); // Tactile audio feedback
-    if (isPlaying) {
-      pauseSound("ambient");
-      setIsPlaying(false);
-    } else {
-      playSound("ambient");
-      setIsPlaying(true);
+    try {
+      playSound("click");
+
+      if (isPlaying) {
+        pauseSound("ambient");
+      } else {
+        playSound("ambient");
+      }
+    } catch (err) {
+      console.warn("Music toggle failed:", err);
     }
   };
 
@@ -55,7 +50,6 @@ export default function MusicToggle() {
         "
         aria-label={isPlaying ? "Pause abstract audio" : "Play abstract audio"}
       >
-        {/* Subtle internal glow on ambient play */}
         <div
           className={`
             absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent
@@ -64,7 +58,6 @@ export default function MusicToggle() {
           `}
         />
 
-        {/* Equalizer Bars */}
         <div className="relative z-10 flex items-end gap-[3px] h-4">
           <div
             className={`w-[3px] bg-white rounded-full transition-all duration-300 ${isPlaying ? "opacity-100 h-[30%] animate-[eqBounce_0.5s_infinite_alternate_ease-in-out]" : "opacity-40 h-[3px]"}`}

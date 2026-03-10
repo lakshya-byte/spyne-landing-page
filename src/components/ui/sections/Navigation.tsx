@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { scrollStore } from "@/hooks/useScrollTimeline";
 
 export default function Navigation() {
@@ -23,21 +24,14 @@ export default function Navigation() {
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="text-primary">
-            <svg
-              className="w-8 h-8"
-              fill="none"
-              viewBox="0 0 48 48"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                clipRule="evenodd"
-                d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z"
-                fill="currentColor"
-                fillRule="evenodd"
-              ></path>
-            </svg>
-          </div>
+          <Image
+            src="/image_copy-removebg-preview.png"
+            alt="Spyne Logo"
+            width={40}
+            height={40}
+            className="h-8 md:h-10 w-auto object-contain rounded-md"
+            priority
+          />
           <span className="text-lg md:text-xl font-black tracking-tighter uppercase text-white">
             Spyne
           </span>

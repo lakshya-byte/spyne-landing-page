@@ -143,7 +143,7 @@ export default function GodTierMinimap() {
 
   return (
     <div
-      className="fixed right-0 top-0 h-screen w-16 sm:w-32 md:w-80 z-50 pointer-events-none flex items-center justify-end pr-2 md:pr-8 transition-all duration-700 ease-out"
+      className="fixed right-0 top-0 h-screen w-16 sm:w-32 md:w-80  pointer-events-none flex items-center justify-end pr-2 md:pr-8 transition-all duration-700 ease-out z-10"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
